@@ -18,6 +18,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 
+import ReactMarkdown from "react-markdown";
+import "./blogpost.css";
+import { Separator } from "@/components/ui/separator";
+import { SyntaxHighlighting } from "@/components/SyntaxHighlighting";
+
 export default function BlogPost(params: {
   preloadedBlogPost: Preloaded<typeof api.blog.getBlogPost>;
 }) {
@@ -26,6 +31,7 @@ export default function BlogPost(params: {
   const updateBlogPost = useMutation(api.blog.updateBlogPost);
   const deleteBlogPost = useMutation(api.blog.deleteBlogPost);
 
+  const [markdownPreview, setMarkdownPreview] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState(false);
   const [blogPostData, setBlogPostData] = useState({
     title: blogPost?.title,
@@ -66,23 +72,51 @@ export default function BlogPost(params: {
               }
             />
           </div>
-          <div className="space-y-1 flex flex-col">
-            <Label htmlFor="content">
-              Content{" "}
-              <span className="text-xs">
-                (<i>Markdown</i>)
-              </span>
-            </Label>
-            <Textarea
-              className="h-96"
-              value={blogPostData.content?.join("\n")}
-              onChange={(e) =>
-                setBlogPostData((prev) => ({
-                  ...prev,
-                  content: [e.target.value],
-                }))
-              }
-            />
+          <div className="space-y-1 flex flex-col relative">
+            {!markdownPreview ? (
+              <>
+                <Label htmlFor="content">
+                  Content{" "}
+                  <span className="text-xs">
+                    (<i>Markdown</i>)
+                  </span>
+                </Label>
+                <Textarea
+                  className="h-96"
+                  value={blogPostData.content?.join("\n")}
+                  onChange={(e) =>
+                    setBlogPostData((prev) => ({
+                      ...prev,
+                      content: [e.target.value],
+                    }))
+                  }
+                />
+              </>
+            ) : (
+              <>
+                <Label htmlFor="content">
+                  Content{" "}
+                  <span className="text-xs">
+                    (<i>Markdown</i>)
+                  </span>
+                </Label>
+                <Separator />
+                <ReactMarkdown
+                  className={"react-markdown"}
+                  // @ts-ignore
+                  components={SyntaxHighlighting}
+                >
+                  {blogPostData.content?.join("\n")}
+                </ReactMarkdown>
+                <Separator />
+              </>
+            )}
+            <Button
+              className="absolute bottom-0 right-0"
+              onClick={() => setMarkdownPreview(!markdownPreview)}
+            >
+              {markdownPreview ? "Edit" : "Preview"}
+            </Button>
           </div>
           <div className="space-y-1 flex flex-col">
             <Label htmlFor="tags">Tags</Label>
