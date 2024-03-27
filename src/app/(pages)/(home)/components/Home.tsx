@@ -23,6 +23,10 @@ export default function Home(params: {
         <div>
           <div className="w-max py-2 space-y-1.5">
             <h2 className="text-4xl font-bold">Projects</h2>
+            <p className="text-sm">
+              There {projects.length === 1 ? "is" : "are"} {projects.length}{" "}
+              project{projects.length === 1 ? "" : "s"}.
+            </p>
             <Link
               href={"/add-project"}
               className={buttonVariants({
@@ -45,6 +49,10 @@ export default function Home(params: {
         <div>
           <div className="w-max py-2 space-y-1.5">
             <h2 className="text-4xl font-bold">Blog Posts</h2>
+            <p className="text-sm">
+              There {blogPosts.length === 1 ? "is" : "are"} {blogPosts.length}{" "}
+              blog post{blogPosts.length === 1 ? "" : "s"}.
+            </p>
             <Link
               href={"/add-blog-post"}
               className={buttonVariants({
