@@ -14,6 +14,9 @@ export default function Home(params: {
   const projects = usePreloadedQuery(params.preloadedProjects);
   const blogPosts = usePreloadedQuery(params.preloadedBlogPosts);
 
+  projects.sort((a, b) => b._creationTime - a._creationTime);
+  blogPosts.sort((a, b) => b._creationTime - a._creationTime);
+
   return (
     <div className="px-4 md:px-12 lg:px-24 py-12">
       <div className="text-3xl lg:text-5xl bg-clip-text text-transparent font-bold bg-gradient-to-r w-max from-cyan-500 to-fuchsia-500">
