@@ -19,7 +19,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 
 import ReactMarkdown from "react-markdown";
-import "./blogpost.css";
 import { Separator } from "@/components/ui/separator";
 import { SyntaxHighlighting } from "@/components/SyntaxHighlighting";
 
@@ -102,7 +101,9 @@ export default function BlogPost(params: {
                 </Label>
                 <Separator />
                 <ReactMarkdown
-                  className={"react-markdown"}
+                  className={
+                    "prose prose-invert prose-h2:mt-2 prose-img:rounded-sm prose-img:shadow-md"
+                  }
                   // @ts-ignore
                   components={SyntaxHighlighting}
                 >
