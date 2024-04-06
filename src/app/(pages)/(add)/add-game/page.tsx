@@ -36,7 +36,6 @@ export default function AddGame() {
   };
 
   const checkStatus = (str: string) => {
-    console.log(str);
     if (str !== "played" && str !== "currentlyPlaying" && str !== "completed")
       return false;
     return true;
