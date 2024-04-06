@@ -35,6 +35,13 @@ export default function AddGame() {
     router.push("/");
   };
 
+  const checkStatus = (str: string) => {
+    console.log(str);
+    if (str !== "played" && str !== "currentlyPlaying" && str !== "completed")
+      return false;
+    return true;
+  };
+
   return (
     <div className="flex justify-center items-center p-4">
       <Card className="w-full md:max-w-2xl lg:max-w-3xl">
@@ -73,12 +80,13 @@ export default function AddGame() {
             <Label htmlFor="status">Status</Label>
             <Input
               value={gameData.status}
-              onChange={(e) =>
+              onChange={(e) => {
                 setGameData((prev) => ({
                   ...prev,
                   status: e.target.value as GameData["status"],
-                }))
-              }
+                }));
+                checkStatus(e.target.value as GameData["status"]);
+              }}
             />
           </div>
           {gameData.status === "completed" && (
@@ -122,9 +130,20 @@ export default function AddGame() {
         </CardContent>
 
         <CardFooter>
-          <Button onClick={addGame} className="w-full" type="submit">
-            Add Game
-          </Button>
+          {gameData.status && checkStatus(gameData.status) ? (
+            <Button onClick={addGame} className="w-full" type="submit">
+              Add Game
+            </Button>
+          ) : (
+            <div className="flex flex-col gap-y-1 w-full">
+              <p className="text-red-500 text-sm">
+                Please select a valid status before adding a new game
+              </p>
+              <Button disabled className="w-full" type="submit">
+                Add Game
+              </Button>
+            </div>
+          )}
         </CardFooter>
       </Card>
     </div>
