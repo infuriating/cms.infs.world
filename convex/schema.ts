@@ -19,8 +19,8 @@ export default defineSchema({
           github: v.optional(v.string()),
           linkedin: v.optional(v.string()),
           website: v.optional(v.string()),
-        }),
-      ),
+        })
+      )
     ),
     inDevelopment: v.boolean(),
   }),
@@ -30,5 +30,17 @@ export default defineSchema({
     title: v.string(),
     content: v.array(v.string()),
     tags: v.array(v.string()),
+  }),
+  games: defineTable({
+    title: v.string(),
+    description: v.string(),
+    status: v.union(
+      v.literal("played"),
+      v.literal("currentlyPlaying"),
+      v.literal("completed")
+    ),
+    difficulties: v.optional(v.array(v.string())),
+    hoursPlayed: v.optional(v.number()),
+    platform: v.array(v.string()),
   }),
 });
