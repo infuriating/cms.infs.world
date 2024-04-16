@@ -121,18 +121,6 @@ export default function AddBlogPost() {
             />
           </div>
           <div className="space-y-1 flex flex-col">
-            <Label htmlFor="tags">Tags</Label>
-            <Input
-              value={blogPostData.tags}
-              onChange={(e) =>
-                setBlogPostData((prev) => ({
-                  ...prev,
-                  tags: [e.target.value],
-                }))
-              }
-            />
-          </div>
-          <div className="space-y-1 flex flex-col">
             <Label htmlFor="image">Image</Label>
             <Input
               value={blogPostData.image}
