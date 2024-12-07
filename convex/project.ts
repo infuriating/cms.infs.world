@@ -33,7 +33,12 @@ export const addProject = mutation({
     description: v.string(),
     images: v.array(v.string()),
     inDevelopment: v.boolean(),
-    technologies: v.array(v.string()),
+    technologies: v.array(
+      v.object({
+        name: v.string(),
+        url: v.string(),
+      }),
+    ),
     collaborators: v.array(
       v.object({
         name: v.string(),
@@ -41,7 +46,7 @@ export const addProject = mutation({
         github: v.string(),
         linkedin: v.string(),
         website: v.string(),
-      })
+      }),
     ),
     github: v.string(),
     tags: v.array(v.string()),
@@ -59,14 +64,13 @@ export const addProject = mutation({
       github,
       tags,
       website,
-    }
+    },
   ) => {
     const slug = title
       .toLowerCase()
       .replace(/[^a-zA-Z0-9]/g, "")
       .replace(/ /g, "-");
 
-    technologies = technologies[0].split(",");
     images = images[0].split(",");
     tags = tags[0].split(",");
 
@@ -94,7 +98,12 @@ export const updateProject = mutation({
     description: v.string(),
     images: v.array(v.string()),
     inDevelopment: v.boolean(),
-    technologies: v.array(v.string()),
+    technologies: v.array(
+      v.object({
+        name: v.string(),
+        url: v.string(),
+      }),
+    ),
     collaborators: v.array(
       v.object({
         name: v.string(),
@@ -102,7 +111,7 @@ export const updateProject = mutation({
         github: v.string(),
         linkedin: v.string(),
         website: v.string(),
-      })
+      }),
     ),
     github: v.string(),
     tags: v.array(v.string()),
@@ -121,7 +130,7 @@ export const updateProject = mutation({
       github,
       tags,
       website,
-    }
+    },
   ) => {
     const project = await ctx.db
       .query("projects")
@@ -151,7 +160,6 @@ export const updateProject = mutation({
       .toLowerCase()
       .replace(/[^a-zA-Z0-9]/g, "")
       .replace(/ /g, "-");
-    project.technologies = project.technologies[0].split(",");
     project.images = project.images[0].split(",");
     project.tags && (project.tags = project.tags[0].split(","));
 

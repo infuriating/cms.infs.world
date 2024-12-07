@@ -1,9 +1,7 @@
 "use client";
 
-import { Preloaded, useMutation, usePreloadedQuery } from "convex/react";
-import React, { useState } from "react";
-import { api } from "../../../../../../../convex/_generated/api";
 import NoProjectFound from "@/components/NoProjectFound";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -12,16 +10,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { api } from "../../../../../../../convex/_generated/api";
+import { Doc } from "../../../../../../../convex/_generated/dataModel";
 
-export default function Project(params: {
-  preloadedProject: Preloaded<typeof api.project.getProject>;
-}) {
+export default function Project({ project }: { project: Doc<"projects"> }) {
   const router = useRouter();
-  const project = usePreloadedQuery(params.preloadedProject);
   const updateProject = useMutation(api.project.updateProject);
   const deleteProject = useMutation(api.project.deleteProject);
 
@@ -96,11 +94,17 @@ export default function Project(params: {
           <div className="space-y-1 flex flex-col">
             <Label htmlFor="technologies">Technologies</Label>
             <Input
-              value={projectData.technologies}
+              value={projectData.technologies.map((t) => t.name).join(", ")}
               onChange={(e) =>
                 setProjectData((prev) => ({
                   ...prev,
-                  technologies: [e.target.value],
+                  technologies: e.target.value
+                    .split(",")
+                    .map((t) => ({
+                      name: t.trim(),
+                      url: "",
+                    }))
+                    .filter((t) => t.name),
                 }))
               }
             />

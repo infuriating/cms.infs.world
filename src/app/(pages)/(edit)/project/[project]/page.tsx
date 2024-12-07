@@ -1,15 +1,14 @@
-import { preloadQuery } from "convex/nextjs";
-import React from "react";
+import { fetchQuery } from "convex/nextjs";
 import { api } from "../../../../../../convex/_generated/api";
 import Project from "./components/Project";
 
-export default async function ProjectPage({
-  params,
-}: {
-  params: { project: string };
+export default async function ProjectPage(props: {
+  params: Promise<{ project: string }>;
 }) {
-  const preloadedProject = await preloadQuery(api.project.getProject, {
+  const params = await props.params;
+  const project = await fetchQuery(api.project.getProject, {
     slug: params.project,
   });
-  return <Project preloadedProject={preloadedProject} />;
+  if (!project) return <>not found</>;
+  return <Project project={project} />;
 }

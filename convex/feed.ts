@@ -3,31 +3,31 @@ import { mutation, query } from "./_generated/server";
 
 export const getAll = query({
   handler: async (ctx) => {
-    return await ctx.db.query("blogPosts").order("desc").collect();
+    return await ctx.db.query("feed").order("desc").collect();
   },
 });
 
 export const getLatestTwo = query({
   handler: async (ctx) => {
-    return await ctx.db.query("blogPosts").order("desc").take(2);
+    return await ctx.db.query("feed").order("desc").take(2);
   },
 });
 
-export const getBlogPost = query({
+export const getFeedPost = query({
   args: {
     slug: v.string(),
   },
   handler: async (ctx, { slug }) => {
-    const project = await ctx.db
-      .query("blogPosts")
+    const feedPost = await ctx.db
+      .query("feed")
       .filter((q) => q.eq(q.field("slug"), slug))
       .first();
 
-    return project;
+    return feedPost;
   },
 });
 
-export const addBlogPost = mutation({
+export const addFeedPost = mutation({
   args: {
     title: v.string(),
     content: v.array(v.string()),
@@ -42,7 +42,7 @@ export const addBlogPost = mutation({
     content = content[0].split("\n");
     tags = tags[0].split(",");
 
-    const project = await ctx.db.insert("blogPosts", {
+    const feedPost = await ctx.db.insert("feed", {
       content,
       slug,
       tags,
@@ -50,11 +50,11 @@ export const addBlogPost = mutation({
       image,
     });
 
-    return project;
+    return feedPost;
   },
 });
 
-export const updateBlogPost = mutation({
+export const updateFeedPost = mutation({
   args: {
     _id: v.string(),
     title: v.string(),
@@ -63,41 +63,41 @@ export const updateBlogPost = mutation({
     image: v.string(),
   },
   handler: async (ctx, { _id, title, content, tags, image }) => {
-    const blogPost = await ctx.db
-      .query("blogPosts")
+    const feedPost = await ctx.db
+      .query("feed")
       .filter((q) => q.eq(q.field("_id"), _id))
       .first();
-    if (!blogPost) throw new ConvexError("Project not found");
+    if (!feedPost) throw new ConvexError("Post not found");
 
-    title ? (blogPost.title = title) : (blogPost.title = blogPost.title);
-    (blogPost.slug = title
+    title ? (feedPost.title = title) : (feedPost.title = feedPost.title);
+    (feedPost.slug = title
       .toLowerCase()
       .replace(/[^a-zA-Z0-9]/g, "")
       .replace(/ /g, "-")),
       content
-        ? (blogPost.content = content)
-        : (blogPost.content = blogPost.content);
-    tags ? (blogPost.tags = tags) : (blogPost.tags = blogPost.tags);
-    image ? (blogPost.image = image) : (blogPost.image = blogPost.image);
+        ? (feedPost.content = content)
+        : (feedPost.content = feedPost.content);
+    tags ? (feedPost.tags = tags) : (feedPost.tags = feedPost.tags);
+    image ? (feedPost.image = image) : (feedPost.image = feedPost.image);
 
     content = content[0].split("\n");
     tags = tags[0].split(",");
 
-    return await ctx.db.replace(blogPost._id, blogPost);
+    return await ctx.db.replace(feedPost._id, feedPost);
   },
 });
 
-export const deleteBlogPost = mutation({
+export const deleteFeedPost = mutation({
   args: {
     _id: v.string(),
   },
   handler: async (ctx, { _id }) => {
-    const blogPost = await ctx.db
-      .query("blogPosts")
+    const feedPost = await ctx.db
+      .query("feed")
       .filter((q) => q.eq(q.field("_id"), _id))
       .first();
-    if (!blogPost) throw new ConvexError("Project not found");
+    if (!feedPost) throw new ConvexError("Post not found");
 
-    return await ctx.db.delete(blogPost._id);
+    return await ctx.db.delete(feedPost._id);
   },
 });
