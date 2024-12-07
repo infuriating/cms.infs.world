@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -27,13 +28,14 @@ export default function Project({ project }: { project: Doc<"projects"> }) {
   const [projectData, setProjectData] = useState({
     _id: project?._id,
     title: project?.title,
-    description: project?.description,
+    short_description: project?.short_description,
+    description: project?.description ?? "",
     images: project?.images,
     technologies: project?.technologies,
     tags: project?.tags,
     github: project?.github,
     website: project?.website,
-    collaborators: project?.collaborators,
+    collaborators: project?.collaborators ?? [],
     inDevelopment: project?.inDevelopment,
   });
 
@@ -68,15 +70,28 @@ export default function Project({ project }: { project: Doc<"projects"> }) {
             />
           </div>
           <div className="space-y-1 flex flex-col">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="short_description">Short Description</Label>
             <Input
-              value={projectData.description}
+              value={projectData.short_description}
+              onChange={(e) =>
+                setProjectData((prev) => ({
+                  ...prev,
+                  short_description: e.target.value,
+                }))
+              }
+            />
+          </div>
+          <div className="space-y-1 flex flex-col">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              value={projectData.description ?? ""}
               onChange={(e) =>
                 setProjectData((prev) => ({
                   ...prev,
                   description: e.target.value,
                 }))
               }
+              rows={8}
             />
           </div>
           <div className="space-y-1 flex flex-col">
@@ -93,21 +108,62 @@ export default function Project({ project }: { project: Doc<"projects"> }) {
           </div>
           <div className="space-y-1 flex flex-col">
             <Label htmlFor="technologies">Technologies</Label>
-            <Input
-              value={projectData.technologies.map((t) => t.name).join(", ")}
-              onChange={(e) =>
+            <div className="space-y-2">
+              {projectData.technologies.map((tech, index) => (
+                <div key={index} className="flex flex-row items-center gap-2">
+                  <Input
+                    placeholder="Name"
+                    value={tech.name}
+                    onChange={(e) =>
+                      setProjectData((prev) => ({
+                        ...prev,
+                        technologies: prev.technologies.map((t, i) =>
+                          i === index ? { ...t, name: e.target.value } : t
+                        ),
+                      }))
+                    }
+                  />
+                  <Input
+                    placeholder="URL"
+                    value={tech.url}
+                    onChange={(e) =>
+                      setProjectData((prev) => ({
+                        ...prev,
+                        technologies: prev.technologies.map((t, i) =>
+                          i === index ? { ...t, url: e.target.value } : t
+                        ),
+                      }))
+                    }
+                  />
+                  <Button
+                    className="min-w-11"
+                    variant="destructive"
+                    size="icon"
+                    onClick={() =>
+                      setProjectData((prev) => ({
+                        ...prev,
+                        technologies: prev.technologies.filter(
+                          (_, i) => i !== index
+                        ),
+                      }))
+                    }
+                  >
+                    ×
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <Button
+              variant="outline"
+              onClick={() =>
                 setProjectData((prev) => ({
                   ...prev,
-                  technologies: e.target.value
-                    .split(",")
-                    .map((t) => ({
-                      name: t.trim(),
-                      url: "",
-                    }))
-                    .filter((t) => t.name),
+                  technologies: [...prev.technologies, { name: "", url: "" }],
                 }))
               }
-            />
+            >
+              Add Technology
+            </Button>
           </div>
           <div className="space-y-1 flex flex-col">
             <Label htmlFor="tags">Tags</Label>

@@ -5,15 +5,15 @@ export default defineSchema({
   projects: defineTable({
     slug: v.string(),
     title: v.string(),
-    description: v.string(),
+    short_description: v.string(),
+    description: v.optional(v.string()),
     images: v.array(v.string()),
     technologies: v.array(
       v.object({
         name: v.string(),
         url: v.string(),
-      }),
+      })
     ),
-
     tags: v.optional(v.array(v.string())),
     github: v.optional(v.string()),
     website: v.optional(v.string()),
@@ -25,8 +25,8 @@ export default defineSchema({
           github: v.optional(v.string()),
           linkedin: v.optional(v.string()),
           website: v.optional(v.string()),
-        }),
-      ),
+        })
+      )
     ),
     inDevelopment: v.boolean(),
   }),
