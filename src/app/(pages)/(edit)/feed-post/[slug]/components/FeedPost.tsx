@@ -1,8 +1,7 @@
 "use client";
 
-import { useMutation } from "convex/react";
-import React, { useState } from "react";
-import { api } from "../../../../../convex/_generated/api";
+import NoProjectFound from "@/components/NoProjectFound";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,30 +10,39 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { api } from "../../../../../../../convex/_generated/api";
 
-import ReactMarkdown from "react-markdown";
-import { Separator } from "@/components/ui/separator";
 import { SyntaxHighlighting } from "@/components/SyntaxHighlighting";
+import { Separator } from "@/components/ui/separator";
+import ReactMarkdown from "react-markdown";
+import { Doc } from "../../../../../../../convex/_generated/dataModel";
 
-export default function AddBlogPost() {
+export default function FeedPost({ feedPost }: { feedPost: Doc<"feed"> }) {
   const router = useRouter();
-  const addBlogPostMutation = useMutation(api.blog.addBlogPost);
+  const updateFeedPost = useMutation(api.feed.updateFeedPost);
+  const deleteFeedPost = useMutation(api.feed.deleteFeedPost);
 
   const [markdownPreview, setMarkdownPreview] = useState(false);
-  const [blogPostData, setBlogPostData] = useState({
-    title: "",
-    content: [""],
-    image: "",
-    tags: [""],
+  const [deleteConfirmation, setDeleteConfirmation] = useState(false);
+  const [feedPostData, setFeedPostData] = useState({
+    title: feedPost?.title,
+    content: feedPost?.content,
+    tags: feedPost?.tags ?? [],
+    image: feedPost?.image,
+    _id: feedPost?._id,
   });
 
-  const addBlogPost = async () => {
-    await addBlogPostMutation(blogPostData);
+  if (!feedPost) return <NoProjectFound />;
+
+  const saveFeedPost = async () => {
+    // @ts-ignore
+    await updateFeedPost(feedPostData);
     router.push("/");
   };
 
@@ -42,18 +50,19 @@ export default function AddBlogPost() {
     <div className="flex justify-center items-center p-4">
       <Card className="w-full md:max-w-2xl lg:max-w-3xl">
         <CardHeader>
-          <CardTitle>Add a blog post</CardTitle>
+          <CardTitle>{feedPost.title}</CardTitle>
           <CardDescription>
-            You are currently creating a new blog post.
+            You are currently editing the feed post <i>{feedPost.title}</i>.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-1 flex flex-col">
+          <div className="space-y-2">
+            <div className="space-y-1 flex flex-col"></div>
             <Label htmlFor="title">Title</Label>
             <Input
-              value={blogPostData.title}
+              value={feedPostData.title}
               onChange={(e) =>
-                setBlogPostData((prev) => ({
+                setFeedPostData((prev) => ({
                   ...prev,
                   title: e.target.value,
                 }))
@@ -71,9 +80,9 @@ export default function AddBlogPost() {
                 </Label>
                 <Textarea
                   className="h-96"
-                  value={blogPostData.content?.join("\n")}
+                  value={feedPostData.content?.join("\n")}
                   onChange={(e) =>
-                    setBlogPostData((prev) => ({
+                    setFeedPostData((prev) => ({
                       ...prev,
                       content: [e.target.value],
                     }))
@@ -96,7 +105,7 @@ export default function AddBlogPost() {
                   // @ts-ignore
                   components={SyntaxHighlighting}
                 >
-                  {blogPostData.content?.join("\n")}
+                  {feedPostData.content?.join("\n")}
                 </ReactMarkdown>
                 <Separator />
               </>
@@ -111,9 +120,9 @@ export default function AddBlogPost() {
           <div className="space-y-1 flex flex-col">
             <Label htmlFor="tags">Tags</Label>
             <Input
-              value={blogPostData.tags.join(", ")}
+              value={feedPostData.tags.join(", ")}
               onChange={(e) =>
-                setBlogPostData((prev) => ({
+                setFeedPostData((prev) => ({
                   ...prev,
                   tags: [e.target.value],
                 }))
@@ -123,9 +132,9 @@ export default function AddBlogPost() {
           <div className="space-y-1 flex flex-col">
             <Label htmlFor="image">Image</Label>
             <Input
-              value={blogPostData.image}
+              value={feedPostData.image}
               onChange={(e) =>
-                setBlogPostData((prev) => ({
+                setFeedPostData((prev) => ({
                   ...prev,
                   image: e.target.value,
                 }))
@@ -134,10 +143,44 @@ export default function AddBlogPost() {
           </div>
         </CardContent>
 
-        <CardFooter>
-          <Button onClick={addBlogPost} className="w-full" type="submit">
-            Add Blog Post
+        <CardFooter className="flex-col gap-y-1">
+          <Button onClick={saveFeedPost} className="w-full" type="submit">
+            Update Feed Post
           </Button>
+          {deleteConfirmation ? (
+            <div className="flex w-full gap-x-2">
+              <Button
+                onClick={() => {
+                  setDeleteConfirmation(false);
+                }}
+                className="w-full"
+                variant="secondary"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  // @ts-ignore
+                  deleteFeedPost({ _id: feedPostData._id });
+                  router.push("/");
+                }}
+                className="w-full"
+                variant="destructive"
+              >
+                Delete Feed Post
+              </Button>
+            </div>
+          ) : (
+            <Button
+              onClick={() => {
+                setDeleteConfirmation(true);
+              }}
+              className="w-full"
+              variant="destructive"
+            >
+              Delete Feed Post
+            </Button>
+          )}
         </CardFooter>
       </Card>
     </div>

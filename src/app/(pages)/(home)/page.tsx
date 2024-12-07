@@ -49,7 +49,7 @@ export default async function WorkWrapper() {
               {feed.length === 1 ? "" : "s"}.
             </p>
             <Link
-              href={"/add-blog-post"}
+              href={"/add-feed-post"}
               className={buttonVariants({
                 variant: "link",
                 className: "px-0",

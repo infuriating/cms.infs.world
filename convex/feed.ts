@@ -37,8 +37,9 @@ export const addFeedPost = mutation({
   handler: async (ctx, { title, content, tags, image }) => {
     const slug = title
       .toLowerCase()
-      .replace(/[^a-zA-Z0-9]/g, "")
-      .replace(/ /g, "-");
+      .replace(/[^a-z0-9-]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
     content = content[0].split("\n");
     tags = tags[0].split(",");
 
@@ -70,13 +71,14 @@ export const updateFeedPost = mutation({
     if (!feedPost) throw new ConvexError("Post not found");
 
     title ? (feedPost.title = title) : (feedPost.title = feedPost.title);
-    (feedPost.slug = title
+    feedPost.slug = title
       .toLowerCase()
-      .replace(/[^a-zA-Z0-9]/g, "")
-      .replace(/ /g, "-")),
-      content
-        ? (feedPost.content = content)
-        : (feedPost.content = feedPost.content);
+      .replace(/[^a-z0-9-]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+    content
+      ? (feedPost.content = content)
+      : (feedPost.content = feedPost.content);
     tags ? (feedPost.tags = tags) : (feedPost.tags = feedPost.tags);
     image ? (feedPost.image = image) : (feedPost.image = feedPost.image);
 

@@ -1,6 +1,5 @@
 "use client";
 
-import NoProjectFound from "@/components/NoProjectFound";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,33 +15,26 @@ import { Textarea } from "@/components/ui/textarea";
 import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { api } from "../../../../../../../convex/_generated/api";
+import { api } from "../../../../../convex/_generated/api";
 
 import { SyntaxHighlighting } from "@/components/SyntaxHighlighting";
 import { Separator } from "@/components/ui/separator";
 import ReactMarkdown from "react-markdown";
-import { Doc } from "../../../../../../../convex/_generated/dataModel";
 
-export default function BlogPost({ feedPost }: { feedPost: Doc<"feed"> }) {
+export default function AddFeedPost() {
   const router = useRouter();
-  const updateFeedPost = useMutation(api.feed.updateFeedPost);
-  const deleteFeedPost = useMutation(api.feed.deleteFeedPost);
+  const addFeedPostMutation = useMutation(api.feed.addFeedPost);
 
   const [markdownPreview, setMarkdownPreview] = useState(false);
-  const [deleteConfirmation, setDeleteConfirmation] = useState(false);
   const [feedPostData, setFeedPostData] = useState({
-    title: feedPost?.title,
-    content: feedPost?.content,
-    tags: feedPost?.tags,
-    image: feedPost?.image,
-    _id: feedPost?._id,
+    title: "",
+    content: [""],
+    image: "",
+    tags: [""],
   });
 
-  if (!feedPost) return <NoProjectFound />;
-
-  const saveFeedPost = async () => {
-    // @ts-ignore
-    await updateFeedPost(feedPostData);
+  const addFeedPost = async () => {
+    await addFeedPostMutation(feedPostData);
     router.push("/");
   };
 
@@ -50,14 +42,13 @@ export default function BlogPost({ feedPost }: { feedPost: Doc<"feed"> }) {
     <div className="flex justify-center items-center p-4">
       <Card className="w-full md:max-w-2xl lg:max-w-3xl">
         <CardHeader>
-          <CardTitle>{feedPost.title}</CardTitle>
+          <CardTitle>Add a feed post</CardTitle>
           <CardDescription>
-            You are currently editing the feed post <i>{feedPost.title}</i>.
+            You are currently creating a new feed post.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <div className="space-y-1 flex flex-col"></div>
+          <div className="space-y-1 flex flex-col">
             <Label htmlFor="title">Title</Label>
             <Input
               value={feedPostData.title}
@@ -120,8 +111,7 @@ export default function BlogPost({ feedPost }: { feedPost: Doc<"feed"> }) {
           <div className="space-y-1 flex flex-col">
             <Label htmlFor="tags">Tags</Label>
             <Input
-              // @ts-expect-error blogPostData.tags is possibly 'undefined'
-              value={blogPostData.tags.join(", ")}
+              value={feedPostData.tags.join(", ")}
               onChange={(e) =>
                 setFeedPostData((prev) => ({
                   ...prev,
@@ -144,44 +134,10 @@ export default function BlogPost({ feedPost }: { feedPost: Doc<"feed"> }) {
           </div>
         </CardContent>
 
-        <CardFooter className="flex-col gap-y-1">
-          <Button onClick={saveFeedPost} className="w-full" type="submit">
-            Update Feed Post
+        <CardFooter>
+          <Button onClick={addFeedPost} className="w-full" type="submit">
+            Add Feed Post
           </Button>
-          {deleteConfirmation ? (
-            <div className="flex w-full gap-x-2">
-              <Button
-                onClick={() => {
-                  setDeleteConfirmation(false);
-                }}
-                className="w-full"
-                variant="secondary"
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={() => {
-                  // @ts-ignore
-                  deleteFeedPost({ _id: feedPostData._id });
-                  router.push("/");
-                }}
-                className="w-full"
-                variant="destructive"
-              >
-                Delete Feed Post
-              </Button>
-            </div>
-          ) : (
-            <Button
-              onClick={() => {
-                setDeleteConfirmation(true);
-              }}
-              className="w-full"
-              variant="destructive"
-            >
-              Delete Feed Post
-            </Button>
-          )}
         </CardFooter>
       </Card>
     </div>
